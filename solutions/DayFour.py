@@ -4,15 +4,17 @@ from enum import Enum
 import pathlib
 from typing import ClassVar, Iterator, Tuple
 
+
 def data_reader(day: str, is_test: bool) -> Iterator[str]:
     path = pathlib.Path(__file__).parent
     if is_test:
-        path = path.parent/"inputs"/"Test"
+        path = path.parent / "inputs" / "Test"
     else:
-        path = path.parent/"inputs"/"Data"
-    with open(path/f"Day{day.title()}") as f:
+        path = path.parent / "inputs" / "Data"
+    with open(path / f"Day{day.title()}") as f:
         for line in f:
-            yield(line.rstrip("\n"))
+            yield (line.rstrip("\n"))
+
 
 def parse_data(data_reader: Iterator[str]) -> list[str]:
     return list(r for r in data_reader)
@@ -20,11 +22,11 @@ def parse_data(data_reader: Iterator[str]) -> list[str]:
 
 class GameBoard:
 
-    # Directions 
+    # Directions
     @dataclass
     class DirectionMixin:
-        x: int
-        y: int
+        r: int
+        c: int
 
     class Direction(DirectionMixin, Enum):
         NW = -1, -1
@@ -35,10 +37,6 @@ class GameBoard:
         SW = 1, -1
         S = 1, 0
         SE = 1, 1
-
-
-
-
 
     def __init__(self, data: list[str]):
         self._data: list[str] = data
@@ -53,40 +51,68 @@ class GameBoard:
         width = len(self._data[0])
         return all(len(r) == width for r in self._data)
 
-    def count_word(self, word: str, r: int = 0, c: int = 0, direction: Direction|None = None):
+    def has_word_at(self, word: str, direction: Direction, r: int = 0, c: int = 0):
+
         if len(word) == 0:
-            return 1
+            return True
+        if not (0 <= r < self._length) or not (0 <= c < self._width):
+            return False
+        if self._data[r][c] != word[0]:
+            return False
+        r += direction.r
+        c += direction.c
+        return self.has_word_at(word[1:], direction, r, c)
+
+    def count_word(self, word: str):
+
+        if len(word) == 0:
+            raise Exception("Zero length word provided")
         count = 0
-        if 
-                if c == word[0]:
-                    if direction:
-                        count += self.count_word(word[1:], direction)
-                    else:
-                        for direction in GameBoard.Direction:
-                            count += self.count_word(word[1:], direction)
-        return 
+        for r in range(self._width):
+            for c in range(self._length):
+                for direction in GameBoard.Direction:
+                    if self.has_word_at(word, direction, r, c):
+                        count += 1
+        return count
 
-
-
-
+    def count_x_mas(self):
+        count = 0
+        for r in range(1, self._length - 1):
+            for c in range(1, self._width - 1):
+                if self._data[r][c] != "A":
+                    continue
+                l_diag = (
+                    self._data[r + GameBoard.Direction.NW.r][
+                        c + GameBoard.Direction.NW.c
+                    ],
+                    self._data[r + GameBoard.Direction.SE.r][
+                        c + GameBoard.Direction.SE.c
+                    ],
+                )
+                r_diag = (
+                    self._data[r + GameBoard.Direction.SW.r][
+                        c + GameBoard.Direction.SW.c
+                    ],
+                    self._data[r + GameBoard.Direction.NE.r][
+                        c + GameBoard.Direction.NE.c
+                    ],
+                )
+                if l_diag in (("M", "S"), ("S", "M")) and r_diag in (
+                    ("M", "S"),
+                    ("S", "M"),
+                ):
+                    count += 1
+        return count
 
 
 def part_one(rows: list[str]) -> int:
-    count = 0
-    for i, row in enumerate(rows):
-        for j, c in row:
-            if c = 'X':
-                # Check all directions for 'XMAS'
-
-            
-    return sum(abs(a - b) for a, b in zip(_sort_l, _sort_r))
+    g = GameBoard(rows)
+    return g.count_word("XMAS")
 
 
-def part_two(left: list[int], right: list[int]) -> int:
-    counts = dict()
-    for x in right:
-        counts[x] = counts.get(x, 0) + 1
-    return sum(a * counts.get(a, 0) for a in left)
+def part_two(rows: list[str]) -> int:
+    g = GameBoard(rows)
+    return g.count_x_mas()
 
 
 if __name__ == "__main__":
@@ -96,9 +122,9 @@ if __name__ == "__main__":
     group.add_argument("--one", action="store_true")
     group.add_argument("--two", action="store_true")
     args = parser.parse_args()
-    dr = data_reader("one", args.test)
-    l, r = parse_data(dr)
+    dr = data_reader("four", args.test)
+    d = parse_data(dr)
     if args.one:
-        print(part_one(l, r))
+        print(part_one(d))
     elif args.two:
-        print(part_two(l, r))
+        print(part_two(d))
