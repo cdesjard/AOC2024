@@ -27,7 +27,7 @@ def parse_data(data_reader: Iterator[str]) -> Tuple[list[Tuple[int]], list[list[
     return rules, updates
 
 
-def part_one(rules: list[Tuple[int]], updates: list[list[int]]):
+def part_one(rules: list[Tuple[int]], updates: list[list[int]]) -> int:
     forbids_dict = dict()
     for a, b in rules:
         forbids_dict.setdefault(b, set()).add(a)
@@ -45,7 +45,7 @@ def part_one(rules: list[Tuple[int]], updates: list[list[int]]):
     return total_sum
 
 
-def part_two(rules: list[Tuple[int]], updates: list[list[int]]):
+def part_two(rules: list[Tuple[int]], updates: list[list[int]]) -> int:
     bad_updates = list()
     forbids_dict = dict()
     for a, b in rules:
