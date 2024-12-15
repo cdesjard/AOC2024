@@ -1,12 +1,8 @@
 import argparse
-from dataclasses import dataclass
-from enum import Enum
 import math
 import pathlib
 import re
-from typing import Iterator, List, Self, Tuple
-
-import numpy as np
+from typing import Iterator, Tuple
 
 
 # TODO(brendes6): Extract to utilities
