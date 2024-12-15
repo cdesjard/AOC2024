@@ -1,8 +1,6 @@
 import argparse
 from dataclasses import dataclass
 from enum import Enum
-import functools
-import itertools
 import pathlib
 from typing import Iterator, List, Self
 
