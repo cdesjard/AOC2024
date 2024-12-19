@@ -2,7 +2,9 @@ import argparse
 import pathlib
 from typing import Iterator
 
+
 from utilities import data_reader
+
 
 def parse_data(data_reader: Iterator[str]) -> Iterator[Iterator[int]]:
     return (map(int, line.split()) for line in data_reader)
